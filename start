@@ -1,0 +1,27 @@
+#!/bin/sh
+
+DOCKER_VERSION=1.3.0
+TARGET_DIR=/target
+
+[[ "${TRACE}" ]] && set -x
+
+check_version() {
+  ${TARGET_DIR}/docker version 2>/dev/null | grep "Client version: ${DOCKER_VERSION}"
+}
+
+main() {
+  if [ -d ${TARGET_DIR} ]; then
+    if check_version; then
+      echo "docker ${DOCKER_VERSION} is already installed"
+    else 
+      echo "Installing docker ${DOCKER_VERSION} to ${TARGET_DIR}"
+      mv ${TARGET_DIR}/docker ${TARGET_DIR}/docker-$(date +%Y%m%d%H%M)
+      cp /docker-${DOCKER_VERSION} ${TARGET_DIR}/docker
+    fi
+  else
+    echo "docker run --rm -v /usr/bin:${TARGET_DIR} sequenceiq/armhf-docker-install:1.3.0"
+  fi
+}
+
+main "$@"
+
